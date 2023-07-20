@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision import models, transforms
+from torchvision import transforms, models
 from torch.utils.data import DataLoader, Dataset, random_split
 
 import os
@@ -12,22 +12,7 @@ import numpy as np
 
 import time
 
-start = time.time()
-
-#-----------------settings-----------------
-# fix pretrained parameters or no
-# True = not freeze, False = freeze
-freeze_parameter = True
-# initial weight
-initial_weight = False
-# dynamic learning rate
-lr_scheduler = True
-# image resize when transform
-resize = 224, 224
-# epochs
-epochs = 1
-#------------------------------------------
-
+# Siamese Network
 class SiameseNetwork(nn.Module):
     def __init__(self, freeze_parameter, initial_weight):
         super(SiameseNetwork, self).__init__()
@@ -73,7 +58,7 @@ class SiameseNetwork(nn.Module):
         output2 = self.forward_once(input2)
         return output1, output2
 
-# Contrastive Loss Implementation
+# contrastive Loss Implementation
 class ContrastiveLoss(torch.nn.Module):
     def __init__(self, margin=1.0):
         super(ContrastiveLoss, self).__init__()
@@ -91,11 +76,7 @@ class ContrastiveLoss(torch.nn.Module):
         loss = torch.sum(loss) / 2.0 / x0.size()[0]
         return loss
 
-# Resnet18 Normalization values
-mean = [0.485, 0.456, 0.406]
-std = [0.229, 0.224, 0.225]
-composed = transforms.Compose([transforms.Resize((resize)),transforms.ToTensor(), transforms.Normalize(mean, std)])
-# Get image data
+# get image data
 class SiameseDataset(Dataset):
     def __init__(self, path, transform=None):
         self.path = path
@@ -176,37 +157,27 @@ class SiameseDataset(Dataset):
     def __len__(self):
         return len(self.paths)
 
-orig_dataset = SiameseDataset('./Dataset', transform=composed)
+# data transform values
+# return composed transform
+def transform (image_size):
+    # Resnet18 Normalization values
+    mean = [0.485, 0.456, 0.406]
+    std = [0.229, 0.224, 0.225]
 
-size_train = int(0.9 * len(orig_dataset))
-size_validation = len(orig_dataset) - size_train
-train_dataset, validation_dataset = random_split(orig_dataset, [size_train, size_validation])
+    composed = transforms.Compose([
+                transforms.Resize((image_size, image_size)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean, std),
+                ])
+    return composed
 
-# Load datasets into DataLoader
-train_loader = DataLoader(dataset=train_dataset, batch_size=20, shuffle=True)
-validation_loader = DataLoader(dataset=validation_dataset, batch_size=1)
-
-# criterion
-criterion = ContrastiveLoss()
-
-# optimizer
-model = SiameseNetwork(freeze_parameter, initial_weight)
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
-
-# Dynamic learning rate
-if lr_scheduler:
-    scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer, base_lr=0.001, max_lr=0.01,step_size_up=5,mode="triangular2")
-
-loss_list = []
-accuracy_list = []
-n_test = len(validation_loader.dataset)
-
-# Train and validate model
-for epoch in range(epochs):
-
+# train model
+# return training loss list
+def train (model, train_loader, optimizer):
     loss_sublist = []
 
     for batch_index, (image_1, image_2, targets) in enumerate(train_loader):
+        image_1, image_2, targets = image_1.to(device), image_2.to(device), targets.to(device)
         model.train()
         optimizer.zero_grad()
         output1, output2 = model(image_1, image_2)
@@ -215,22 +186,21 @@ for epoch in range(epochs):
         loss_sublist.append(loss.item())
 
         loss.backward()
-        optimizer.step()   
+        optimizer.step()
+    return loss_sublist
 
-    loss_list.append(np.mean(loss_sublist))
-    # test_loss = 0
+# validate model
+# return validation accuracy list
+def validate (model, validation_loader, num_validation_sample):
     correct = 0
-
     with torch.no_grad():
         for (image_1, image_2, targets) in validation_loader:
+            image_1, image_2, targets = image_1.to(device), image_2.to(device), targets.to(device)
             model.eval()
             output1, output2 = model(image_1, image_2)
 
             # eucledian_distance is 1D tensor
             eucledian_distance = nn.functional.pairwise_distance(output1, output2)
-
-            #            criterion output is 1D tensor        item() gets the number from the tensor
-            # test_loss += criterion(output1, output2, targets).item()
 
             # prediction outputs 1 when distance < 0.5, outputs 0 when >= 0.5
             predict = torch.where(eucledian_distance < 0.5, 1, 0)
@@ -238,53 +208,161 @@ for epoch in range(epochs):
             #          output True as 1 or False as 0
             correct += predict.eq(targets.view_as(predict)).item()
     
-    accuracy = correct / n_test
-    accuracy_list.append(accuracy)
+    accuracy = correct / num_validation_sample
+    return accuracy
 
-    # test_loss /= n_test
-    # print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-    #     test_loss, correct, n_test,
-    #     100. * accuracy))
-    print('1 epochos done')
+# create data loader from dataset
+# return (train_loader, validation_loader)
+def create_data_loader(dataset_path, batch):
+    orig_dataset = SiameseDataset(dataset_path, transform=transform(resize))
 
-def plot_stuff(COST,ACC, title, file_name):    
+    size_train = int(0.9 * len(orig_dataset))
+    size_validation = len(orig_dataset) - size_train
+    train_dataset, validation_dataset = random_split(orig_dataset, [size_train, size_validation])
+
+    # Load datasets into DataLoader
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch, shuffle=True)
+    validation_loader = DataLoader(dataset=validation_dataset, batch_size=1)
+    return train_loader, validation_loader
+
+# function for saving trained model
+def save_model(model, save_path, save_model_name):
+        save_model_name = save_model_name + '.pt'
+        torch.save(model.state_dict(), os.path.join(save_path, save_model_name))
+
+# plot training loss and validation accuracy
+def plot_stuff(loss, accuracy, save_path, save_plot, title, file_name):    
     fig, ax1 = plt.subplots(figsize=(10,6))
     color = 'tab:red'
-    ax1.plot(COST, color = color)
+    ax1.plot(loss, color = color)
     ax1.set_xlabel('Iteration', color = color)
     ax1.set_ylabel('total loss', color = color)
     ax1.tick_params(axis = 'y', color = color)
     
     ax2 = ax1.twinx()  
     color = 'tab:blue'
-    ax2.set_ylabel('accuracy', color = color)  # we already handled the x-label with ax1
-    ax2.plot(ACC, color = color)
+    ax2.set_ylabel('accuracy', color = color)  # already handled the x-label with ax1
+    ax2.plot(accuracy, color = color)
     ax2.tick_params(axis = 'y', color = color)
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     
-    plt.subplots_adjust(top = 0.8)
+    plt.subplots_adjust(top = 0.6)
     plt.title(title)
-    plt.savefig(os.path.join('./Training_Result/', file_name + '.jpg'))
+    if save_plot:
+        plt.savefig(os.path.join(save_path, file_name + '.jpg'))
     plt.show()
 
-end = time.time()
-print("The time of execution of above program is :",
-      (end-start), "seconds")
-
-settings = ("FreezeParameter" + str(freeze_parameter) + 
-            "_InitialWeight" + str(initial_weight) + 
-            "_lrScheduler" + str(lr_scheduler) + 
-            "_Resize" + str(resize[0]) + 
-            "_Epochs" + str(epochs))
-
-settings_title = ("Freeze Parameter: " + str(freeze_parameter) + 
-            "\nInitial Weight: " + str(initial_weight) + 
-            "\nlr Scheduler: " + str(lr_scheduler) + 
-            "\nResize: " + str(resize) + 
-            "\nEpochs: " + str(epochs))
-
-plot_stuff(loss_list, accuracy_list, settings_title, settings)
-
+#================================================================
+#---------------------------settings-----------------------------
+# fix pretrained parameters or no
+# True = not freeze, False = freeze
+freeze_parameter = False
+# initialize the weights
+initialize_weight = False
+# learning rate scheduler
+lr_scheduler = True
+base_learning_rate = 0.001
+max_learning_rate = 0.01
+learning_rate_step = 10
+lr_mode = "triangular2"
+# image resize when transform
+resize = 224
+# batch size for training
+batch = 5
+# epochs
+epochs = 1
+# set device
+device = torch.device("cpu")
+# save loss and accuracy plot
+save_plot = False
 # save trained model
-# save_model_name = settings + '.pt'
-# torch.save(model.state_dict(), os.path.join('./Training_Result/', save_model_name))
+save_trained_model = False
+# dataset path
+dataset_path = './Dataset'
+# save file path
+save_path = './Training_Result/'
+#---------------------------settings-----------------------------
+#================================================================
+
+
+#=======================================================================================
+#----------------------------------------main-------------------------------------------
+start_time = time.time()
+
+# data loaders
+train_loader = create_data_loader(dataset_path, batch)[0]
+validation_loader = create_data_loader(dataset_path, batch)[1]
+
+# loss criterion
+criterion = ContrastiveLoss()
+
+# model
+model = SiameseNetwork(freeze_parameter, initialize_weight).to(device)
+
+# optimizer
+optimizer = torch.optim.SGD(model.parameters(), lr=base_learning_rate)
+
+# Dynamic learning rate
+if lr_scheduler:
+    scheduler = torch.optim.lr_scheduler.CyclicLR(optimizer,
+                                                  base_lr=base_learning_rate,
+                                                  max_lr=max_learning_rate,
+                                                  step_size_up=learning_rate_step,
+                                                  mode=lr_mode)
+
+# data for performance analysis
+loss_list = []
+accuracy_list = []
+num_validation_sample = len(validation_loader.dataset)
+
+# Train and validate model
+for epoch in range(epochs):
+    # train 
+    loss_sublist = train(model, train_loader, optimizer)
+    # update trainning loss for each epoch
+    loss_list.append(np.mean(loss_sublist))
+
+    # validate
+    accuracy = validate(model, validation_loader, num_validation_sample)
+    # update validation accuracy for each epoch
+    accuracy_list.append(accuracy)
+
+    if lr_scheduler:
+        scheduler.step()
+
+    print('loop ', epoch + 1, ' done')
+
+end_time = time.time()
+run_time_spent = end_time - start_time
+print("The time of execution of the program is :", run_time_spent, "seconds")
+
+settings_name_for_file = ("Resnet18" + 
+            "_FreezeParameter" + str(freeze_parameter) +
+            "_InitializeWeight" + str(initialize_weight) +
+            "_Resize" + str(resize) +
+            "_Epochs" + str(epochs) +
+            "_Batch" + str(batch) +
+            "_lrScheduler" + str(lr_scheduler) +
+            "_LR" + str(base_learning_rate) + "to" + str(max_learning_rate) +
+            "_LRstep" + str(learning_rate_step) +
+            "_LRmode" + str(lr_mode))
+
+settings_name_for_plot_title = ("Model used: Resnet18" + 
+            "\nFreeze Parameter: " + str(freeze_parameter) +
+            "\nInitialize Weights: " + str(initialize_weight) +
+            "\nResize Image: " + str(resize) +
+            "\nEpochs: " + str(epochs) +
+            "\nBatch: " + str(batch) +
+            "\nLearning Rate Scheduler: " + str(lr_scheduler) +
+            "\nLearning Rate: " + str(base_learning_rate) + " to " + str(max_learning_rate) +
+            "\nLearning Rate Step: " + str(learning_rate_step) +
+            "\nLearning Rate Mode: " + str(lr_mode) + 
+            "\nTime Spent: " + str(run_time_spent))
+
+plot_stuff(loss_list, accuracy_list, save_path, save_plot, settings_name_for_plot_title, settings_name_for_file)
+
+if save_trained_model:
+    save_model(model, save_path, settings_name_for_file)
+
+#----------------------------------------main-------------------------------------------
+#=======================================================================================
