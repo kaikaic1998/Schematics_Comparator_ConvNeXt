@@ -1,0 +1,4 @@
+*.h linguist-detectable=false
+*.txt linguist-detectable=false
+Makefile linguist-detectable=false
+*.1 linguist-detectable=false
