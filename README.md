@@ -82,7 +82,7 @@ This ConvNeXt model-based Siamese Model has proven its ability to accurately dis
 |:---|:---:|
 | Siamese Networks with ConvNeXt model | [Link](With_ConvNeXt.py) |
 | Siamese Networks with Resnet18 model | [Link](With_ResNet.py) |
-| Fine-tune and validation results | [Link](With_ResNet.py) |
+| Fine-tune and validation results | [Link](Training_Result) |
 
 ## Reference
 <p align="left">
