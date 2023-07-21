@@ -270,7 +270,7 @@ resize = 224
 # batch size for training
 batch = 5
 # epochs
-epochs = 1
+epochs = 25
 # set device
 device = torch.device("cpu")
 # save loss and accuracy plot
