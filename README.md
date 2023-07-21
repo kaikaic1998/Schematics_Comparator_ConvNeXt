@@ -24,7 +24,7 @@ Because of the adaptivity and ability to identify similarities between images, m
 
 <h3 align="center">Specific Machine Learning Method</h3>
 <p align="left">
-A Samese Network is designed to identify the similarity between two images. It is a neural network that consists of two identical subnetworks meaning that they contain the same parameters and weights. Each subnetwork can be any neural network designed for images like a Convolutional Neural Network.
+A Siamese Network is designed to identify the similarity between two images. It is a neural network that consists of two identical subnetworks meaning that they contain the same parameters and weights. Each subnetwork can be any neural network designed for images like a Convolutional Neural Network.
 </p> 
 <p align="left">
 The network’s input is a pair of images that are either similar (positive example) or not similar (negative example). The network's output is the two feature vectors, one for each image. 
@@ -40,7 +40,7 @@ class="center">
 
 <h3 align="center">Model Used in the Siamese Networks</h3>
 <p align="left">
-The pre-trained ConvNeXt model is chosen to construct the Siamese Networks. And the pre-trained Resnet18 model is used to construct the same SIamese Networks as a comparison with the ConvNeXt model.
+The pre-trained ConvNeXt model is chosen to construct the Siamese Networks. And the pre-trained Resnet18 model is used to construct the same Siamese Networks as a comparison with the ConvNeXt model.
 </p>
 <p align="left">
 The ConvNeXt model was proposed in A ConvNet for the 2020s by Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, Saining Xie. ConvNeXT is a pure convolutional model (ConvNet), inspired by the design of Vision Transformers, that claims to outperform them.
