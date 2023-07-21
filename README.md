@@ -60,7 +60,7 @@ There are 21 different classes prepared. The same class has different variations
 
 <h3 align="center">ConvNeXt and Resnet18 Fine-tune Rusults</h3>
 <p align="left">
-By comparing with the Resnet18 model, the ConvNeXt model can achieve out-of-sample accuracy of more than 90% in 10 epochs. The Resnet18 model on the other hand, can only peak at 90% out-of-sample accuracy.
+By comparing with the Resnet18 model, the ConvNeXt model can achieve a stable out-of-sample accuracy of more than 90% in 10 epochs, and its training loss can reach less than 2.5% at 15 epochs. The Resnet18 model, on the other hand, has out-of-sample accuracy fluctuating, and can not maintain a stable high out-of-sample accuracy, and its training loss is still around 6% after 25 epochs.
 </p>
 
 <p align="center"><b>Best Results Settings for both Models</b></p>
