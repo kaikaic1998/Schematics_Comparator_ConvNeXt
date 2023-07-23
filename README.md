@@ -93,3 +93,13 @@ This ConvNeXt model-based Siamese Model has proven its ability to accurately dis
 
 [ConvNeXt Hugging Face](https://huggingface.co/docs/transformers/main/model_doc/convnext)
 </p>
+
+## Citation
+```
+@Article{liu2022convnet,
+  author  = {Zhuang Liu and Hanzi Mao and Chao-Yuan Wu and Christoph Feichtenhofer and Trevor Darrell and Saining Xie},
+  title   = {A ConvNet for the 2020s},
+  journal = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year    = {2022},
+}
+```
