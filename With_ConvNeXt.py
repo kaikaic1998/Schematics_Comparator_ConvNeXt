@@ -259,9 +259,9 @@ resize = 256
 # batch size for training
 batch = 5
 # epochs
-epochs = 20
+epochs = 3
 # set device
-device = torch.device("cpu")
+device = torch.device("cuda")
 # save loss and accuracy plot
 save_plot = True
 # save trained model
