@@ -247,7 +247,7 @@ def plot_stuff(loss, accuracy, save_path, save_plot, title, file_name):
 #---------------------------settings-----------------------------
 # fix pretrained parameters or no
 # True = not freeze, False = freeze
-freeze_parameter = False
+freeze_parameter = True
 # learning rate scheduler
 lr_scheduler = True
 base_learning_rate = 0.001
@@ -259,7 +259,7 @@ resize = 256
 # batch size for training
 batch = 5
 # epochs
-epochs = 3
+epochs = 25
 # set device
 device = torch.device("cuda")
 # save loss and accuracy plot
