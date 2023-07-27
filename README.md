@@ -103,3 +103,39 @@ This ConvNeXt model-based Siamese Model has proven its ability to accurately dis
   year    = {2022},
 }
 ```
+
+## Siamese Networks with ConvNeXt Implementation
+[With_ConvNeXt.py](https://github.com/kaikaic1998/Schematics_Comparator_ConvNeXt_Siamese_Networks/blob/main/With_ConvNeXt.py)
+```
+class SiameseNetwork(nn.Module):
+    def __init__(self, freeze_parameter):
+        super(SiameseNetwork, self).__init__()
+
+        model_name = "convnext_xlarge.fb_in22k"
+        self.model = create_model(model_name, pretrained=True)
+
+        # fix pretrained parameters or not
+        # True = not freeze
+        # False = freeze
+        for param in self.model.parameters():
+            param.requires_grad = freeze_parameter
+
+        # # add linear layers to compare between the features of the two images
+        self.model.head.fc = nn.Sequential(
+            nn.Linear(self.model.num_features, 256),
+            nn.GELU(),
+            nn.Linear(256, 2),
+        )
+
+    def forward_once(self, x):
+        output = self.model(x)
+        output = output.view(output.size()[0], -1)
+        return output
+
+    def forward(self, input1, input2):
+        # get two images' features
+        output1 = self.forward_once(input1)
+        output2 = self.forward_once(input2)
+        
+        return output1, output2
+```
