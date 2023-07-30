@@ -259,13 +259,13 @@ resize = 256
 # batch size for training
 batch = 5
 # epochs
-epochs = 25
+epochs = 2
 # set device
 device = torch.device("cuda")
 # save loss and accuracy plot
-save_plot = True
+save_plot = False
 # save trained model
-save_trained_model = True
+save_trained_model = False
 # dataset path
 dataset_path = './Dataset'
 # save file path

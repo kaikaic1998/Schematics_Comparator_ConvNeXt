@@ -50,6 +50,7 @@ class SiameseNetwork(nn.Module):
     def forward_once(self, x):
         output = self.model(x)
         output = output.view(output.size()[0], -1)
+        output = self.fc(output)
         return output
 
     def forward(self, input1, input2):
@@ -256,7 +257,7 @@ def plot_stuff(loss, accuracy, save_path, save_plot, title, file_name):
 #---------------------------settings-----------------------------
 # fix pretrained parameters or no
 # True = not freeze, False = freeze
-freeze_parameter = False
+freeze_parameter = True
 # initialize the weights
 initialize_weight = False
 # learning rate scheduler
@@ -272,7 +273,7 @@ batch = 5
 # epochs
 epochs = 25
 # set device
-device = torch.device("cpu")
+device = torch.device("cuda")
 # save loss and accuracy plot
 save_plot = False
 # save trained model
