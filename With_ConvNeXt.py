@@ -263,9 +263,9 @@ epochs = 2
 # set device
 device = torch.device("cuda")
 # save loss and accuracy plot
-save_plot = False
+save_plot = True
 # save trained model
-save_trained_model = False
+save_trained_model = True
 # dataset path
 dataset_path = './Dataset'
 # save file path
