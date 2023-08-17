@@ -76,34 +76,6 @@ By comparing with the Resnet18 model, the ConvNeXt model can achieve a stable ou
 This ConvNeXt model-based Siamese Model has proven its ability to accurately disdinguish the similarity between two complex schematics documents, and it has been deployed to the actual computer hardware development team. 
 </p>
 
-## Catalog
-
-| Description | Links |
-|:---|:---:|
-| Siamese Networks with ConvNeXt model | [Link](With_ConvNeXt.py) |
-| Siamese Networks with Resnet18 model | [Link](With_ResNet.py) |
-| Fine-tune and validation results | [Link](Training_Result) |
-
-## Reference
-<p align="left">
-
-[A ConvNet for the 2020s Paper](https://arxiv.org/abs/2201.03545)
-
-[ConvNeXt Github by Facebook Research](https://github.com/facebookresearch/ConvNeXt)
-
-[ConvNeXt Hugging Face](https://huggingface.co/docs/transformers/main/model_doc/convnext)
-</p>
-
-## Citation
-```
-@Article{liu2022convnet,
-  author  = {Zhuang Liu and Hanzi Mao and Chao-Yuan Wu and Christoph Feichtenhofer and Trevor Darrell and Saining Xie},
-  title   = {A ConvNet for the 2020s},
-  journal = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year    = {2022},
-}
-```
-
 ## Siamese Networks with ConvNeXt Implementation
 [With_ConvNeXt.py](https://github.com/kaikaic1998/Schematics_Comparator_ConvNeXt_Siamese_Networks/blob/main/With_ConvNeXt.py)
 ```
@@ -138,4 +110,32 @@ class SiameseNetwork(nn.Module):
         output2 = self.forward_once(input2)
         
         return output1, output2
+```
+
+## Catalog
+
+| Description | Links |
+|:---|:---:|
+| Siamese Networks with ConvNeXt model | [Link](With_ConvNeXt.py) |
+| Siamese Networks with Resnet18 model | [Link](With_ResNet.py) |
+| Fine-tune and validation results | [Link](Training_Result) |
+
+## Reference
+<p align="left">
+
+[A ConvNet for the 2020s Paper](https://arxiv.org/abs/2201.03545)
+
+[ConvNeXt Github by Facebook Research](https://github.com/facebookresearch/ConvNeXt)
+
+[ConvNeXt Hugging Face](https://huggingface.co/docs/transformers/main/model_doc/convnext)
+</p>
+
+## Citation
+```
+@Article{liu2022convnet,
+  author  = {Zhuang Liu and Hanzi Mao and Chao-Yuan Wu and Christoph Feichtenhofer and Trevor Darrell and Saining Xie},
+  title   = {A ConvNet for the 2020s},
+  journal = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year    = {2022},
+}
 ```
