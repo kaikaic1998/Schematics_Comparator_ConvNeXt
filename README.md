@@ -34,7 +34,7 @@ If the input pairs are similar, we want these two vectors to be as close as poss
 </p>
 <p align="center">
 Siamese Network
-<img src="./Siamese_Networks_Image.jpg" width=100% height=100% 
+<img src="assets/Siamese_Networks_Image.jpg" width=100% height=100% 
 class="center">
 </p>
 
@@ -46,7 +46,7 @@ The pre-trained ConvNeXt model is chosen to construct the Siamese Networks. And 
 The ConvNeXt model was proposed in A ConvNet for the 2020s by Zhuang Liu, Hanzi Mao, Chao-Yuan Wu, Christoph Feichtenhofer, Trevor Darrell, Saining Xie. ConvNeXT is a pure convolutional model (ConvNet), inspired by the design of Vision Transformers, that claims to outperform them.
 </p>
 <p align="center">
-<img src="./ConvNeXt_Model.jpg" width=100% height=100% 
+<img src="assets/ConvNeXt_Model.jpg" width=100% height=100% 
 class="center">
 </p>
 
@@ -68,7 +68,7 @@ By comparing with the Resnet18 model, the ConvNeXt model can achieve a stable ou
 
 | ConvNeXt | Resnet18 |
 |:-------------------------:|:-------------------------:|
-![](./Training_Result/ConvNeXt_FreezeParameterTrue_Resize256_Epochs25_Batch5_lrSchedulerTrue_LR0.001to0.01_LRstep10_LRmodetriangular2.jpg)  |  ![](./Training_Result/Resnet18_FreezeParameterTrue_InitializeWeightFalse_Resize224_Epochs25_Batch5_lrSchedulerTrue_LR0.001to0.01_LRstep10_LRmodetriangular2.jpg)
+![](assets/ConvNeXt_result.jpg)  |  ![](assets/resnet_result.jpg)
 </p>
 
 <h3 align="center">Conclusion</h3>
