@@ -3,6 +3,9 @@
 With ConvNeXt model based Siamese Network
 </p>
 
+<img src="assets/Explain.png" width=100% height=100% 
+class="center">
+
 <h3 align="center">Background</h3>
 <p align="left"> 
 During computer hardware development, circuit schematics documentation with hundreds of pages is updated on a regular basis. 
